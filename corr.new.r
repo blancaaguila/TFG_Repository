@@ -1,3 +1,6 @@
+# This file takes as an input a correlation matrix, from the original PCHI-C bam,
+# and plots the correlation between the different samples. 
+########################################################################################################################
 library(viridis)
 library(ggplot2)
 library(gridExtra)
@@ -11,6 +14,8 @@ library(dplyr)
   
 #######################
 # call dispersion point table
+#######################
+
 setwd("/media/blanca/JavierreLab/BLANCA/lab_externo/correlations") #File locations
 b<- read.delim('blanca.txt') # points to plot
 b <- b[,3:14]
@@ -25,9 +30,9 @@ distances.calculated <- calculate_distances(b)
 reference.table<- ref.tab(distances.calculated,ncol(b))
 final <- plot1(distances.calculated, reference.table, c)
 splotdistribution(distances.calculated)
-###################
+########################################################################################
 ### CALCULATE DISTANCES : calculates diff on reads comparing each of the samples
-####################
+#########################################################################################
 calculate_distances <- function(filei){
   s <- ncol(filei)
   for(l in 1:s){ ##### CHANGE
@@ -39,9 +44,9 @@ calculate_distances <- function(filei){
 }
 
 
-#####################
-### REORGANIZE MATRI : into a data set (left colum comparisons, right correlation value of the comparison)
-####################
+##########################################################################################
+### REORGANIZE MATRIX : into a data set (left colum comparisons, right correlation value of the comparison)
+#########################################################################################
 # not need it !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 reorg.matrix <- function(cor.mat){
   output <- vector(mode = "numeric", length = 0)
@@ -62,9 +67,9 @@ reorg.matrix <- function(cor.mat){
 }
 
 
-################
+############################################################################################################
 ##### REFERENCE TABLE
-###########################
+###########################################################################################################
 # n col initials 
 ref.tab <- function(dist_b,n){
   # creates a data frame indicating the position where the comparisons start until the end 
@@ -107,10 +112,10 @@ ref.tab <- function(dist_b,n){
 }
 
 #table(b1$ETO1KO==b1[,b2$pos.y[2]])
-#########################
+#####################################################################################################################
 ########## PLOT CORRELATION
-#######################
-#### tengo que empeezar en 13
+#####################################################################################################################
+#### IT has to start in 13
 
 b2 ### error en el negth de la table (devemos restar 12)
 
@@ -134,9 +139,9 @@ plot1 <- function(file, re.tab, sub_mat){
 }
 
 
-#####################
+#################################################################################################################
 ######## PLOT DISTRIBUTION
-###################
+###############################################################################################################
 
 plotdistribution <- function(file){
   for(i in 13:ncol(file)){ ### chagne
