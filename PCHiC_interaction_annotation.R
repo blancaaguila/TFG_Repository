@@ -1,3 +1,6 @@
+# This file aims to annotate non.captured Hind III fragments. Later they will be used to classify the interactions, 
+# in diverse categories. The categories can be visualized by a sankey Plot
+################################################################################################
 options(stringsAsFactors = T)
 setwd('/home/blanca/Desktop/c') 
 library('ape')
@@ -10,14 +13,14 @@ library(GenomicRanges)
 library(plyranges)
 library(tidyverse)
 library(dplyr)
+
 #################################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-################################################################  #############################
-### (A) ANOTATATE HINDIII fragments###############################################################
-##############################################################################################
-
+#############################################################################################
+#############################################################################################
+### (A) ANOTATATE HINDIII fragments #########################################################
+#############################################################################################
 gff <- read.gff('Homo_sapiens.GRCh37.87_subset.gff3', GFF3=T)
 str(gff)
 gff$seqid <- unfactor(gff$seqid)
@@ -29,9 +32,9 @@ hind[is.na(hind)] <- "NA"
 hind <- hind[hind$annotation=='.',] # other-ends
 
 # 836961-21876 = number of hind III other end
-############# 
+#############################################################################################
 ### TRANSCRIPT FILTERING
-############
+#############################################################################################
 
 attributes <- str_split_fixed(string = gff$attributes, pattern = ';', n=11)
 table(gsub(':.*','',attributes[,1]))
@@ -50,9 +53,9 @@ nrow(gff.gene)
 r.hind.copy <- makeGRangesFromDataFrame(hind, keep.extra.columns = T, start.field = 'start', end.field = 'end', seqnames.field ='chr')
 r.gff.trans <- makeGRangesFromDataFrame(gff.trans, keep.extra.columns = T)
 
-######################
+#############################################################################################
 ### GENE BODY  (1993215)
-#####################
+#############################################################################################
 
 #final.hind <- final.hind %>% mutate(.,FULL_GENE_BODY= ifelse((final.hind %in% gene.body.hind),'TRUE', 'FALSE'))
 
@@ -61,10 +64,9 @@ gene.body.hind.2 <- unique(mixed.gene.body.pre$r.hind.copy)
 final.hind.2 <- r.hind.copy
 final.hind.2 <- final.hind.2 %>% mutate(., GENE_BODY=ifelse((final.hind.2 %in% gene.body.hind.2), 'TRUE', 'FALSE'))
 # TRUE: overlaping any kind, FALSE: non overlaping
-####################################################################################################
+#############################################################################################
 #### TSS: strand + (start) strand - (end) 
-####################################################################################################
-
+#############################################################################################
 
 # CALCULATE TSS FOR EACH OF THE STRANDS
 tss.mas <-r.gff.trans %>%  #####aqui tenia tss.overlap
@@ -86,10 +88,10 @@ final.hind.2 <- final.hind.2 %>% mutate(., TSS=ifelse((final.hind.2 %in% tss.ove
                                                       ifelse((final.hind.2 %in% gene.body.hind.2), 'FALSE', 'NA')))
 
 # TRUE: tss overlaping within, FALSE: tss not overlaping, but still a gene body, NA: intergenic
-####################################################################################################
-##### TSS CODING
-####################################################################################################
 
+#############################################################################################
+##### TSS CODING
+#############################################################################################
 #table(tss.ovelap$r.hind.copy %in% group.overlaps.1$r.hind.copy)
 
 r.gff.gene <- makeGRangesFromDataFrame(gff.gene, keep.extra.columns = T)
@@ -139,11 +141,9 @@ final.hind.2 <- final.hind.2 %>% mutate(., PROTEIN_CODING_TSS=ifelse((final.hind
 final.hind.2
 #table(final.hind$PROTEIN_CODING)
 
-
-
-######################
+#############################################################################################
 #### INTERGENIC  (358555)
-#######################
+#############################################################################################
 
 non.overlaps <- filter_by_non_overlaps(r.hind.copy, r.gff.trans)
 
@@ -152,14 +152,9 @@ final.hind.2 <- final.hind.2%>% mutate(., FULL_INTERGENIC=ifelse((final.hind.2 %
 #table(final.hind$FULL_INTERGENIC)
 final.hind.2
 
-
-
-
-
-
-####################################
+#############################################################################################
 #### MIXED AND MIXED PROTEIN CODING 
-###################################
+#############################################################################################
 
 # hay que restar de mixed los tss true
 
@@ -207,7 +202,7 @@ table(final.hind.2$PROT_COD_MIX)
 
 
 
-#######################
+####################################################################################################################
 
 final.hind.2
 a <- final.hind.2 %>% mutate(., CATEGORY=ifelse((final.hind.2$TSS==TRUE & final.hind.2$PROTEIN_CODING_TSS==TRUE), 'tss_prot_coding',
@@ -226,8 +221,8 @@ category.tab <- as.data.frame(a)
 write.table(category.tab, file = 'Annotated_Hind_III_Categories.txt', sep = '\t', row.names = F)
 
 
-######################################
-#####################################
+########################################################################################################################
+
 b <- final.hind.2 %>% mutate(., CATEGORY=ifelse((final.hind.2$TSS==TRUE & final.hind.2$PROTEIN_CODING_TSS==TRUE), 'tss_coding',
                                                 ifelse((final.hind.2$TSS==TRUE & final.hind.2$PROTEIN_CODING_TSS==FALSE), 'tss_noncoding',
                                                        ifelse((final.hind.2$MIXED_GENE_BODY==TRUE & final.hind.2$PROT_COD_MIX==TRUE), 'genebody_coding',
@@ -243,14 +238,15 @@ write.table(category.tab.2, file = 'Annotated_Hind_III_Categories.2.txt', sep = 
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
+#############################################################################################
+#############################################################################################
+######### (B) Integrate the annotated file and plot Sankey
+#############################################################################################
 
-#####################################################################
-######### (B)
-######################################################################
 
-###############################
+#############################################################################################
 ##### Function joining interaction coordinates with the anotation of captured and uncaptured fragments
-################################
+#############################################################################################
 categorize.1 <- function(interactions.file, capture, uncapture){
   interactions.file <- left_join(interactions.file, capture,  by=c('chr_I'='chr', 'start_I'='start', 'end_I'='end'))
   colnames(interactions.file)[7] <- 'catured_left'
@@ -260,9 +256,9 @@ categorize.1 <- function(interactions.file, capture, uncapture){
   return(interactions.file)
 }
 
-#############################
+#############################################################################################
 ###### CLASSIFY
-#############################
+#############################################################################################
 
 classify.1 <- function(interactions.file){
   primed.inter.3 <- interactions.file
@@ -292,9 +288,10 @@ classify.1 <- function(interactions.file){
   return(primed.inter.3)
 }
 
-###################
-#
-#################
+
+#############################################################################################
+# Prepear table for Sankey
+#############################################################################################
 table.create <- function(inter.file, total){
   primed.inter.3 <- inter.file
   plot.names <- c("Captured non-promoters",          "Captured non-coding promoters", 
@@ -338,6 +335,10 @@ table.create <- function(inter.file, total){
   return(percentage.table)
 }
 
+#############################################################################################
+# Change format function
+#############################################################################################
+
 # Chr_I, Start_I, End_I , Chr_II, Start_II, End_II
 change.format <- function(data.file){
   #data.file <- read.table(new.file, header = T, stringsAsFactors = F )
@@ -350,9 +351,9 @@ change.format <- function(data.file){
   data.file <- data.file[,c(1,2,3,7,8,9)] # IF WE want to plot sankey
   return(data.file)
 }
-#################
+#############################################################################################
 ###### PLOT SANKEY
-#################
+#############################################################################################
 
 plot.sankey.inter <- function(interactions.file, percentage.table, libname){
   a <- as.data.frame(table(interactions.file$deti))
@@ -403,9 +404,10 @@ plot.sankey.inter <- function(interactions.file, percentage.table, libname){
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-############### 
-### (C)
-#################
+#############################################################################################
+############################################################################################# 
+### (C) Iterate over all the interaction files 
+#############################################################################################
 
 #setwd('/media/blanca/JavierreLab/JavierreLab/CDK8i_project/correlations/')
 library('ape')
@@ -423,13 +425,15 @@ library(webshot)
 # install_phantomjs()
 library(htmlwidgets)
 
-#############
+#############################################################################################
 ## Read files
-################
+#############################################################################################
+# Captured/non.captured Hind III annotated fragements
 non.captured <-read.table('Annotated_Hind_III_Categories.2.txt', header = T)
 captured <- read.table('captured_categories.txt', header = T)
 head(non.captured)
 head(captured)
+
 # (1) Reorganize captured and uncaptured table such: 
 # captured chr, start, end, category.1
 # uncaptured chr, start, end, category.2
@@ -450,6 +454,7 @@ s <- dir('/home/blanca/Desktop/c/file_ibed/')
 s <- str_split_fixed(s, pattern = '_', n=2)
 s <- s[,1]
 s
+
 #### save html
 path = '/home/blanca/Desktop/c/file_ibed/'
 out.file<-""
@@ -464,7 +469,6 @@ for(i in 1:length(file.names)){
 length(datalist)
 as_tibble(datalist[[1]])
 
-# ESTA HECO SIN REANOTAR 
 for(i in 1:length(s)){
   step.1 <- change.format(datalist[[i]]) # sankey_p53_30abril2020
   step.2 <- categorize.1(step.1, captured, non.captured) #26abirl2020
