@@ -1,4 +1,5 @@
-  # Script which removes duplicates from a segmonk file (chicago output)
+# Script which removes duplicates from a segmonk file (chicago output)
+############################################################################################
 clean_seqmonk <- function(file)
 {
   ## This should be removed since when you install the package {tidyverse} should be
