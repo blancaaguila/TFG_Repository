@@ -1,3 +1,6 @@
+### Classifies PCHi-C interactions by distance and by promoter-promoter vs promoter-other end
+###################################################################################################################
+
 library(stringr)
 library(GenomicRanges)
 # files alredy cleaned
@@ -29,7 +32,9 @@ change.format <- function(data.file){
 
 #new_data.anotated
 
-###################
+###############################################################################################################
+# By fragment 1 vs fragment 2 distance
+###############################################################################################################
 list.distances= list()
 calculatedis <- function(file, libname){
   #file <- read.table(file, header = T)
@@ -79,6 +84,9 @@ calculatedis <- function(file, libname){
 #a<- calculatedis('/media/blanca/JavierreLab/BLANCA/lab_externo/p53_chicago/chicago.ibed/ETO1KO', s[1])
 
 
+###################################################################################################################
+#### P-P vs P-OE
+###################################################################################################################
 
 calcdistprominter <- function(file, libname){
   #file <- read.table(file, header = T)
